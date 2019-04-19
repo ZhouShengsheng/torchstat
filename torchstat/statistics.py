@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torchstat import ModelHook
 from collections import OrderedDict
-from torchstat import StatTree, StatNode, report_format
+from torchstat import StatTree, StatNode, report_format, report_simple
 
 
 def get_parent_node(root_node, stat_node_name):
@@ -65,7 +65,25 @@ class ModelStat(object):
         report = report_format(collected_nodes)
         print(report)
 
+    def report_simple(self):
+        collected_nodes = self._analyze_model()
+        return report_simple(collected_nodes)
+
 
 def stat(model, input_size, query_granularity=1):
     ms = ModelStat(model, input_size, query_granularity)
     ms.show_report()
+
+def stat_simple(model, input_size, query_granularity=1):
+    """
+    Get simplified stat for a model with specific input_size.
+
+    Args:
+        model: Torch model.
+
+    Returns:
+        stats (list): Stats including total_parameters_quantity, total_memory, total_operation_quantity, total_flops, total_duration, total_mread, total_mwrite, total_memrw.
+    """
+    ms = ModelStat(model, input_size, query_granularity)
+    return ms.report_simple()
+

@@ -8,8 +8,8 @@ from torchstat.compute_madd import compute_madd
 from torchstat.compute_flops import compute_flops
 from torchstat.stat_tree import StatTree, StatNode
 from torchstat.model_hook import ModelHook
-from torchstat.reporter import report_format
-from torchstat.statistics import stat, ModelStat
+from torchstat.reporter import report_format, report_simple
+from torchstat.statistics import stat, stat_simple
 
 __all__ = ['report_format', 'StatTree', 'StatNode', 'compute_madd',
            'compute_flops', 'ModelHook', 'stat', 'ModelStat', '__main__',

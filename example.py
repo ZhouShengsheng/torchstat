@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchstat import stat
+import torchvision.models as models
+import torchstat
 
 
 class Net(nn.Module):
@@ -24,5 +25,19 @@ class Net(nn.Module):
 
 
 if __name__ == '__main__':
+    # Get stats of self defined network
     model = Net()
-    stat(model, (3, 224, 224))
+    # torchstat.stat(model, (3, 224, 224))
+    stats = torchstat.stat_simple(model, (3, 224, 224))
+    print("Stats for Net:")
+    print("total_parameters_quantity, total_memory, total_operation_quantity, total_flops, total_duration, total_mread, total_mwrite, total_memrw")
+    print(stats)
+    print()
+
+    # Get stats of provided network
+    model = models.resnet18()
+    stats = torchstat.stat_simple(model, (3, 224, 224))
+    print("Stats for Resnet18:")
+    print("total_parameters_quantity, total_memory, total_operation_quantity, total_flops, total_duration, total_mread, total_mwrite, total_memrw")
+    print(stats)
+

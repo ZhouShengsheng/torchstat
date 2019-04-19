@@ -81,3 +81,39 @@ def report_format(collected_nodes):
     summary += "Total Flops: {}Flops\n".format(round_value(total_flops))
     summary += "Total MemR+W: {}B\n".format(round_value(total_memrw, True))
     return summary
+
+def report_simple(collected_nodes):
+    data = list()
+    for node in collected_nodes:
+        name = node.name
+        input_shape = ' '.join(['{:>3d}'] * len(node.input_shape)).format(
+            *[e for e in node.input_shape])
+        output_shape = ' '.join(['{:>3d}'] * len(node.output_shape)).format(
+            *[e for e in node.output_shape])
+        parameter_quantity = node.parameter_quantity
+        inference_memory = node.inference_memory
+        MAdd = node.MAdd
+        Flops = node.Flops
+        mread, mwrite = [i for i in node.Memory]
+        duration = node.duration
+        data.append([name, input_shape, output_shape, parameter_quantity,
+                     inference_memory, MAdd, duration, Flops, mread,
+                     mwrite])
+    df = pd.DataFrame(data)
+    df.columns = ['module name', 'input shape', 'output shape',
+                  'params', 'memory(MB)',
+                  'MAdd', 'duration', 'Flops', 'MemRead(B)', 'MemWrite(B)']
+    df['duration[%]'] = df['duration'] / (df['duration'].sum() + 1e-7)
+    df['MemR+W(B)'] = df['MemRead(B)'] + df['MemWrite(B)']
+    total_parameters_quantity = df['params'].sum()
+    total_memory = df['memory(MB)'].sum()
+    total_operation_quantity = df['MAdd'].sum()
+    total_flops = df['Flops'].sum()
+    total_duration = df['duration[%]'].sum()
+    total_mread = df['MemRead(B)'].sum()
+    total_mwrite = df['MemWrite(B)'].sum()
+    total_memrw = df['MemR+W(B)'].sum()
+    del df['duration']
+
+    return (total_parameters_quantity, total_memory, total_operation_quantity,
+           total_flops, total_duration, total_mread, total_mwrite, total_memrw)
