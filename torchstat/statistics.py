@@ -11,7 +11,7 @@ def get_parent_node(root_node, stat_node_name):
     node = root_node
     names = stat_node_name.split('.')
     for i in range(len(names) - 1):
-        node_name = '.'.join(names[0:i+1])
+        node_name = '.'.join(names[0:i + 1])
         child_index = node.find_child_index(node_name)
         assert child_index != -1
         node = node.children[child_index]
@@ -27,7 +27,7 @@ def convert_leaf_modules_to_stat_tree(leaf_modules):
         names = leaf_module_name.split('.')
         for i in range(len(names)):
             create_index += 1
-            stat_node_name = '.'.join(names[0:i+1])
+            stat_node_name = '.'.join(names[0:i + 1])
             parent_node = get_parent_node(root_node, stat_node_name)
             node = StatNode(name=stat_node_name, parent=parent_node)
             parent_node.add_child(node)
@@ -48,7 +48,7 @@ def convert_leaf_modules_to_stat_tree(leaf_modules):
 class ModelStat(object):
     def __init__(self, model, input_size, query_granularity=1):
         assert isinstance(model, nn.Module)
-        assert isinstance(input_size, (tuple, list)) and len(input_size) == 3
+        # assert isinstance(input_size, (tuple, list)) and len(input_size) == 3
         self._model = model
         self._input_size = input_size
         self._query_granularity = query_granularity
@@ -74,6 +74,7 @@ def stat(model, input_size, query_granularity=1):
     ms = ModelStat(model, input_size, query_granularity)
     ms.show_report()
 
+
 def stat_simple(model, input_size, query_granularity=1):
     """
     Get simplified stat for a model with specific input_size.
@@ -82,8 +83,8 @@ def stat_simple(model, input_size, query_granularity=1):
         model: Torch model.
 
     Returns:
-        stats (list): Stats including total_parameters_quantity, total_memory, total_operation_quantity, total_flops, total_duration, total_mread, total_mwrite, total_memrw.
+        stats (list): Stats including total_parameters, total_memory, total_madds, total_flops, total_duration,
+        total_mread, total_mwrite, total_memrw.
     """
     ms = ModelStat(model, input_size, query_granularity)
     return ms.report_simple()
-

@@ -114,6 +114,7 @@ def compute_Softmax_madd(module, inp, out):
 
 def compute_Linear_madd(module, inp, out):
     assert isinstance(module, nn.Linear)
+    # print(f"inp.size(): {inp.size()}, out.size(): {out.size()}")
     assert len(inp.size()) == 2 and len(out.size()) == 2
 
     num_in_features = inp.size()[1]

@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 pd.set_option('display.width', 1000)
 pd.set_option('display.max_rows', 10000)
 pd.set_option('display.max_columns', 10000)
@@ -9,12 +8,12 @@ pd.set_option('display.max_columns', 10000)
 def round_value(value, binary=False):
     divisor = 1024. if binary else 1000.
 
-    if value // divisor**4 > 0:
-        return str(round(value / divisor**4, 2)) + 'T'
-    elif value // divisor**3 > 0:
-        return str(round(value / divisor**3, 2)) + 'G'
-    elif value // divisor**2 > 0:
-        return str(round(value / divisor**2, 2)) + 'M'
+    if value // divisor ** 4 > 0:
+        return str(round(value / divisor ** 4, 2)) + 'T'
+    elif value // divisor ** 3 > 0:
+        return str(round(value / divisor ** 3, 2)) + 'G'
+    elif value // divisor ** 2 > 0:
+        return str(round(value / divisor ** 2, 2)) + 'M'
     elif value // divisor > 0:
         return str(round(value / divisor, 2)) + 'K'
     return str(value)
@@ -82,6 +81,7 @@ def report_format(collected_nodes):
     summary += "Total MemR+W: {}B\n".format(round_value(total_memrw, True))
     return summary
 
+
 def report_simple(collected_nodes):
     data = list()
     for node in collected_nodes:
@@ -107,7 +107,7 @@ def report_simple(collected_nodes):
     df['MemR+W(B)'] = df['MemRead(B)'] + df['MemWrite(B)']
     total_parameters_quantity = df['params'].sum()
     total_memory = df['memory(MB)'].sum()
-    total_operation_quantity = df['MAdd'].sum()
+    total_madd = df['MAdd'].sum()
     total_flops = df['Flops'].sum()
     total_duration = df['duration[%]'].sum()
     total_mread = df['MemRead(B)'].sum()
@@ -115,5 +115,5 @@ def report_simple(collected_nodes):
     total_memrw = df['MemR+W(B)'].sum()
     del df['duration']
 
-    return (total_parameters_quantity, total_memory, total_operation_quantity,
-           total_flops, total_duration, total_mread, total_mwrite, total_memrw)
+    return (total_parameters_quantity, total_memory, total_madd,
+            total_flops, total_duration, total_mread, total_mwrite, total_memrw)
