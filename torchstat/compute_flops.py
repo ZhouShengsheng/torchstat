@@ -12,6 +12,11 @@ def compute_flops(module, inp, out):
         return compute_Pool2d_flops(module, inp, out)
     elif isinstance(module, (nn.ReLU, nn.ReLU6, nn.PReLU, nn.ELU, nn.LeakyReLU)):
         return compute_ReLU_flops(module, inp, out)
+    # TODO: Add flops calculations for sigmoid, tanh and other activations
+    elif isinstance(module, (nn.Sigmoid, nn.LogSigmoid)):
+        pass
+    elif isinstance(module, nn.Tanh):
+        pass
     elif isinstance(module, nn.Upsample):
         return compute_Upsample_flops(module, inp, out)
     elif isinstance(module, nn.Linear):
@@ -31,19 +36,18 @@ def compute_Conv2d_flops(module, inp, out):
     in_c = inp.size()[1]
     k_h, k_w = module.kernel_size
     out_c, out_h, out_w = out.size()[1:]
-    groups = module.groups
+    # groups = module.groups
 
-    filters_per_channel = out_c // groups
-    conv_per_position_flops = k_h * k_w * in_c * filters_per_channel
-    active_elements_count = batch_size * out_h * out_w
+    # filters_per_channel = out_c // groups
+    # conv_per_position_flops = (2 * k_h * k_w - 1) * in_c * filters_per_channel
+    # active_elements_count = batch_size * out_h * out_w
+    # total_conv_flops = conv_per_position_flops * active_elements_count
 
-    total_conv_flops = conv_per_position_flops * active_elements_count
+    common_part = in_c * out_h * out_w * out_c
+    conv_flops = (2 * k_h * k_w - 1) * common_part
+    bias_flops = 0 if module.bias is None else common_part
 
-    bias_flops = 0
-    if module.bias is not None:
-        bias_flops = out_c * active_elements_count
-
-    total_flops = total_conv_flops + bias_flops
+    total_flops = batch_size * (conv_flops + bias_flops)
     return total_flops
 
 
@@ -78,7 +82,8 @@ def compute_Linear_flops(module, inp, out):
     assert isinstance(module, nn.Linear)
     assert len(inp.size()) == 2 and len(out.size()) == 2
     batch_size = inp.size()[0]
-    return batch_size * inp.size()[1] * out.size()[1]
+    # flops = (I + I - 1) * J + J = 2IJ
+    return batch_size * inp.size()[1] * out.size()[1] * 2
 
 def compute_Upsample_flops(module, inp, out):
     assert isinstance(module, nn.Upsample)
